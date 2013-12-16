@@ -6,10 +6,12 @@
 
 <!-- Stylesheets -->
 <link rel="stylesheet" href="css/dashicons.css">
+<link rel="stylesheet" href="css/jquery-ui-1.10.3.min.css">
 <link rel="stylesheet" href="css/style.css">
 
 <!-- JavaScript -->
 <script src="js/jquery-1.9.1.min.js"></script>
+<script src="js/jquery-ui-1.10.3.min.js"></script>
 <script type="text/javascript">
 	function copyToClipboard ( text, copyMode ) {
 		if ( copyMode == "css" ) {
@@ -22,7 +24,8 @@
 	}
 	
 	function pickRandomIcon() {
-		var divs = jQuery("#iconlist div").get().sort(function(){
+		var attr, cssclass, 
+			divs = jQuery("#iconlist div").get().sort(function(){
 				return Math.round(Math.random())-0.5;
 			}).slice(0,1);
 	
@@ -33,6 +36,7 @@
 	}
 	
 	function displayGlyph( attr, cssclass ) {
+		var csstext, htmltext, glyphtemp, glyphtext, output;
 	
 		// css copy string
 		csstext = 'content: \"\\' + attr + '";';
@@ -58,19 +62,36 @@
 	
 	}
 	
-	jQuery(document).ready(function() {
+	jQuery(document).ready(function( $ ) {
 	
 		pickRandomIcon();
 	
-		jQuery( '#iconlist div' ).click(function() {
+		$( '#iconlist div' ).click(function() {
+			var attr, cssclass;
 	
-			attr = jQuery( this ).attr( 'alt' );
-			cssclass = jQuery( this ).attr( 'class' );
+			attr = $( this ).attr( 'alt' );
+			cssclass = $( this ).attr( 'class' );
 	
 			displayGlyph( attr, cssclass );
 	
 		});
-	
+
+		var icons = [];
+		$( '#iconlist div' ).each( function( index, element ){
+			icons.push({
+				'label': $( element ).attr('class').replace('dashicons dashicons-', '').replace('-', ' '),
+				'attr': $( element ).attr('alt'),
+				'cssclass': $( this ).attr( 'class' )
+			});
+		});
+
+		$( "#search-filter" ).autocomplete({
+			source: icons,
+			select: function( event, ui ) {
+				displayGlyph( ui.item.attr, ui.item.cssclass );
+			}
+		});
+
 	});
 </script>
 </head>
@@ -89,6 +110,7 @@
 			
 			<div class="description">
 				<p>Dashicons icon font for MP6, currently in development. You can check out MP6 at <a href="http://wordpress.org/extend/plugins/mp6/">http://wordpress.org/extend/plugins/mp6/</a>.</p>
+				<p><input type="search" name="search-filter" id="search-filter" value="" /></p>
 			</div>
 			
 		</div>
